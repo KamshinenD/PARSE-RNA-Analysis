@@ -3,27 +3,5 @@ __pycache__/
 .ipynb_checkpoints/
 .DS_Store
 
-# ---------------------------------------------------------------------------
-# Heavy data that NO notebook reads — not pushed, to keep the repo light.
-# These are inputs for regeneration only (scripts/data_gen/) or provenance;
-# they stay on disk locally and can be regenerated or fetched from the drive.
-# Everything the 22 notebooks actually read IS tracked.
-# ---------------------------------------------------------------------------
-
-# extracted-feature tables used only by the scoring-table regeneration scripts
-data/reference/all_uniques_features/
-data/reference/low_quality_features/
-
-# high-quality torsions: S3 reads only pairs.csv + hbonds.csv (kept); not these
-data/reference/high_quality_features/torsions.csv
-data/reference/high_quality_features/torsions_all.csv
-
-# per-pair scores over the full unique set: provenance only, no notebook reads it
-data/reference/scores/pair_scores_all_uniques.json
-
-# Heavy data files that ARE read by notebooks but too big for git (>50 MB).
-# Notebooks are committed WITH their outputs (figures embedded), so review needs
-# no data; re-executing S3/S4 requires these — keep them locally / on the drive.
-data/reference/scores/pair_scores_uniques_parse.jsonl
-data/reference/high_quality_features/pairs.csv
-data/reference/high_quality_features/hbonds.csv
+# All data is fetched from NRDStor (see README) — not tracked in git.
+data/
