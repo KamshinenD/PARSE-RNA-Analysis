@@ -5,3 +5,4 @@ __pycache__/
 
 # All data is fetched from NRDStor (see README) — not tracked in git.
 data/
+*.zip
