@@ -7,11 +7,11 @@ and produces one figure.
 
 ```
 notebooks/
-  figures/               main-figure panels (Figures 3, 4)
-  supplemental_figures/  supplementary-figure panels (S1–S5)
-figures/    the generated PNG for each notebook
-data/       inputs the notebooks read
-scripts/    run_all.sh, fetch_all_pdb_rnas.py, data_gen/
+  figures/
+  supplemental_figures/
+figures/
+data/
+scripts/
 ```
 
 ## Running
