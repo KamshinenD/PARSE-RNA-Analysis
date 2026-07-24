@@ -67,8 +67,8 @@ python calculate_penalty_weights.py         # -> penalty_weights.json
 ```
 
 ### Level 3 — Regenerate the feature tables from raw structures
-The feature CSVs come straight from the PARSE C++ engine — no Python
-pair-finder is involved. Build the engine, then re-extract:
+The feature CSVs come straight from the PARSE C++ engine. Build the engine,
+then re-extract:
 
 ```bash
 # 1. Build the engine (C++20, CMake >= 3.28)
