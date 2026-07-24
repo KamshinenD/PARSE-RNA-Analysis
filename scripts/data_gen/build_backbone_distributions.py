@@ -37,10 +37,9 @@ import numpy as np
 import pandas as pd
 
 REPO = Path(__file__).resolve().parent.parent.parent
-import _pairfinder_path  # noqa: F401,E402  (adds pair_finder from PARSE_CODE_REPO)
 sys.path.insert(0, str(REPO / "scripts" / "data_gen"))
-from pair_finder.core.identifiers import parse_res_seq  # noqa: E402
-from pair_finder.scoring.richardson import (  # noqa: E402
+from _vendor.helpers import parse_res_seq  # noqa: E402
+from _vendor.richardson import (  # noqa: E402
     OUTLIER_CONFORMER, SUITE_ANGLE_NAMES, RichardsonClassifier, signed_angle_gap,
 )
 from build_prosco_distributions import build_prosco_cell  # noqa: E402

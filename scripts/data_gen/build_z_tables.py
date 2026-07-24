@@ -25,8 +25,7 @@ from pathlib import Path
 
 # Repository and paths
 REPO = Path(__file__).resolve().parent.parent.parent
-import _pairfinder_path  # noqa: F401,E402  (adds pair_finder from PARSE_CODE_REPO)
-from pair_finder.scoring.hbond_distance_policy import (  # noqa: E402
+from _vendor.hbond_distance_policy import (  # noqa: E402
     select_distance_rows, base_base_rows,
 )
 REF = REPO / "data" / "reference"

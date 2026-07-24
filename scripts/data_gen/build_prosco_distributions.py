@@ -41,11 +41,10 @@ import pandas as pd
 from scipy.stats import gaussian_kde
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
-import _pairfinder_path  # noqa: F401,E402  (adds pair_finder from PARSE_CODE_REPO)
-from pair_finder.scoring.canonical import (  # noqa: E402
+from _vendor.canonical import (  # noqa: E402
     SELF_RECIPROCAL_LW, SIGN_FLIPPING_PAIR_PARAMS,
 )
-from pair_finder.scoring.hbond_distance_policy import (  # noqa: E402
+from _vendor.hbond_distance_policy import (  # noqa: E402
     select_distance_rows, base_base_rows,
 )
 
