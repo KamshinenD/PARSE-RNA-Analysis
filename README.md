@@ -9,21 +9,13 @@ feature from raw structures.
 
 ```
 notebooks/
-  figures/               figure3.ipynb, figure4.ipynb          (main-text figures)
-  supplemental_figures/  figS1..figS5.ipynb                    (supplemental figures)
-figures/                 rendered PNGs (also embedded in the executed notebooks)
+  figures/               main-text figure notebooks
+  supplemental_figures/  supplemental figure notebooks
+figures/                 rendered PNGs
 scripts/
-  run_all.sh             re-execute every notebook -> figures/
-  fetch_data.sh          rsync the archived data/ into place
-  fetch_all_pdb_rnas.py  RCSB query -> reference_sets/all_pdb_rnas.csv
-  data_gen/              scoring-table + feature regeneration (see Level 2 / 3)
-    extract_pair_features.py, extract_backbone_torsions.py     (features from the engine)
-    build_prosco_distributions.py, build_z_tables.py,
-    build_backbone_distributions.py, calculate_penalty_weights.py  (tables from features)
-    _engine.py           thin wrapper around the PARSE `parse` binary
-    _vendor/             small self-contained helpers (no external deps)
-data/                    NOT in git — fetched from the archive (see Data)
-requirements.txt
+  data_gen/              feature + scoring-table regeneration
+  validation/            PDB-REDO validation
+data/                    fetched from the archive (not in git)
 ```
 
 ## Setup
@@ -96,6 +88,24 @@ Then rebuild the tables (Level 2) and the figures (Level 1). Both extractors tak
 `--limit N` for a quick smoke test and `--engine /path/to/parse` to override
 `PARSE_ENGINE`.
 
+#### Validation data (PDB-REDO)
+The PDB-REDO comparison behind the validation figure is regenerated the same
+way — fetch the re-refined coordinates, then rescore original vs REDO with the
+engine:
+
+```bash
+cd scripts/validation
+python fetch_pdb_redo.py          # uniqueRNAS.csv -> data/validation/redo_files/
+python compare_pdb_redo_cpp.py    # score original (RCSB) vs REDO -> the two JSONs
+```
+
+`fetch_pdb_redo.py` downloads `<id>_final.pdb` from pdb-redo.eu for every
+candidate in `reference_sets/uniqueRNAS.csv` that has a PDB-REDO entry (the rest
+are skipped — the ones that succeed *are* the validation set).
+`compare_pdb_redo_cpp.py` then writes `pdb_redo_comparison_all.json` and
+`pdb_redo_pairs_comparison.json`. PDB-REDO and RCSB are living databases, so a
+re-fetch may add or refresh a few entries versus the archived comparison.
+
 ## Data
 
 `data/` is not tracked in git (see `.gitignore`), so a fresh clone can **view**
@@ -108,8 +118,7 @@ bash scripts/fetch_data.sh <your_hcc_username>
 
 It rsyncs `/mnt/nrdstor/yesselmanlab/dewan/PARSE-data/data/` (NRDStor, HCC —
 requires a yesselmanlab allocation) into `data/`; files already present are
-skipped. A public Zenodo mirror will replace NRDStor at publication — only
-`scripts/fetch_data.sh` changes.
+skipped. The archive will later be moved to Zenodo.
 
 ### What's in `data/reference/`
 
