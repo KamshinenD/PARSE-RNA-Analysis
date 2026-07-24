@@ -16,7 +16,7 @@ scripts/
   run_all.sh             re-execute every notebook -> figures/
   fetch_data.sh          rsync the archived data/ into place
   fetch_all_pdb_rnas.py  RCSB query -> reference_sets/all_pdb_rnas.csv
-  data_gen/              scoring-table + feature regeneration (see Tier 2 / 3)
+  data_gen/              scoring-table + feature regeneration (see Level 2 / 3)
     extract_pair_features.py, extract_backbone_torsions.py     (features from the engine)
     build_prosco_distributions.py, build_z_tables.py,
     build_backbone_distributions.py, calculate_penalty_weights.py  (tables from features)
@@ -32,25 +32,27 @@ requirements.txt
 pip install -r requirements.txt
 ```
 
-## Reproducibility tiers
+## Reproducibility levels
 
-Each tier rebuilds the inputs of the one above it. Pick the deepest one you need.
+Each level rebuilds the inputs of the one above it. Pick the deepest one you need.
 
-### Tier 0 — View the figures
+### Level 0 — View the figures
 The rendered PNGs live in `figures/`, and each executed notebook embeds its
 output. Nothing to install or fetch.
 
-### Tier 1 — Re-run the figures from the archived data
-Fetch the data (below), then:
+### Level 1 — Re-run the figures from the archived data
+The `data/` directory is not tracked in git (see [Data](#data)). Fetch it, then
+re-execute every notebook:
 
 ```bash
-bash scripts/run_all.sh          # executes notebooks/*/*.ipynb in place
+bash scripts/fetch_data.sh <your_hcc_username>   # rsync the archive into data/
+bash scripts/run_all.sh                          # execute notebooks/*/*.ipynb in place
 ```
 
 Every figure is rebuilt into `figures/`. Set `PARSE_PYTHON` to choose the
 interpreter.
 
-### Tier 2 — Rebuild the scoring tables from the feature tables
+### Level 2 — Rebuild the scoring tables from the feature tables
 The scoring tables in `data/reference/scoring_tables/` are derived from the
 per-pair / per-residue feature CSVs in `data/reference/high_quality_features/`
 (and `low_quality_features/` for the penalty weights). Regenerate them with the
@@ -64,7 +66,7 @@ python build_backbone_distributions.py      # -> backbone_prosco_distributions.j
 python calculate_penalty_weights.py         # -> penalty_weights.json
 ```
 
-### Tier 3 — Regenerate the feature tables from raw structures
+### Level 3 — Regenerate the feature tables from raw structures
 The feature CSVs come straight from the PARSE C++ engine — no Python
 pair-finder is involved. Build the engine, then re-extract:
 
@@ -90,25 +92,24 @@ python extract_pair_features.py \
     --output-dir    ../../data/reference/low_quality_features
 ```
 
-Then rebuild the tables (Tier 2) and the figures (Tier 1). Both extractors take
+Then rebuild the tables (Level 2) and the figures (Level 1). Both extractors take
 `--limit N` for a quick smoke test and `--engine /path/to/parse` to override
 `PARSE_ENGINE`.
 
 ## Data
 
-Large data files are not tracked in git (see `.gitignore`). A fresh clone can
-still **view** the figures (Tier 0); everything below that needs `data/`.
-
-The archived `data/` currently lives on NRDStor (HCC). With a yesselmanlab
-allocation, fetch it all in one command:
+`data/` is not tracked in git (see `.gitignore`), so a fresh clone can **view**
+the figures (Level 0) but needs the archive fetched for anything below that
+(Levels 1–3). The fetch is a single command — see [Level 1](#level-1--re-run-the-figures-from-the-archived-data):
 
 ```bash
 bash scripts/fetch_data.sh <your_hcc_username>
 ```
 
-It rsyncs `/mnt/nrdstor/yesselmanlab/dewan/PARSE-data/data/` into `data/`;
-files already present are skipped. (A public Zenodo mirror will replace NRDStor
-at publication — only `scripts/fetch_data.sh` changes.)
+It rsyncs `/mnt/nrdstor/yesselmanlab/dewan/PARSE-data/data/` (NRDStor, HCC —
+requires a yesselmanlab allocation) into `data/`; files already present are
+skipped. A public Zenodo mirror will replace NRDStor at publication — only
+`scripts/fetch_data.sh` changes.
 
 ### What's in `data/reference/`
 
