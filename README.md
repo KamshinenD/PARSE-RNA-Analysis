@@ -35,16 +35,15 @@ The rendered PNGs live in `figures/`, and each executed notebook embeds its
 output. Nothing to install or fetch.
 
 ### Level 1 — Re-run the figures from the archived data
-The `data/` directory is not tracked in git (see [Data](#data)). Fetch it, then
-re-execute every notebook:
+The `data/` directory is not tracked in git (see [Data](#data)). Fetch it:
 
 ```bash
 bash scripts/fetch_data.sh <your_hcc_username>   # rsync the archive into data/
-bash scripts/run_all.sh                          # execute notebooks/*/*.ipynb in place
 ```
 
-Every figure is rebuilt into `figures/`. Set `PARSE_PYTHON` to choose the
-interpreter.
+Then open the notebooks under `notebooks/figures/` and
+`notebooks/supplemental_figures/` and run each one; every figure is written into
+`figures/main/` or `figures/supplemental/`.
 
 ### Level 2 — Rebuild the scoring tables from the feature tables
 The scoring tables in `data/reference/scoring_tables/` are derived from the
