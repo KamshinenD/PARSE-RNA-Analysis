@@ -26,9 +26,7 @@ data/                    fetched from the archive (not in git)
 pip install -r requirements.txt
 ```
 
-## Reproducibility levels
-
-Each level rebuilds the inputs of the one above it. Pick the deepest one you need.
+## Reproducing the analysis
 
 ### Level 0 — View the figures
 The rendered PNGs live in `figures/`, and each executed notebook embeds its

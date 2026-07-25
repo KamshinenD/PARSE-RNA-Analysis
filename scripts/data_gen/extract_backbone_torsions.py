@@ -81,6 +81,10 @@ def main() -> None:
     df = pd.DataFrame(all_rows)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(args.output, index=False)
+    if df.empty:
+        print(f"\nWrote {args.output} (EMPTY) — the engine returned no `backbone_torsions`. "
+              "Build `parse` from a PARSE-RNA version that emits per-residue backbone torsions.")
+        return
     print(f"\nWrote {args.output}")
     print(f"  {len(df):,} residues  |  {df.pdb_id.nunique()} structures  |  "
           f"{df.conformer.nunique()} conformers  |  in-cluster {int((~df['is_outlier']).sum()):,}")
