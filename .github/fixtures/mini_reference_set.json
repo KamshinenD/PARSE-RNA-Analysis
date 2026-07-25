@@ -1,0 +1,7 @@
+{
+ "_comment": "Tiny 2-structure reference set used only by CI to smoke-test the engine-driven feature extraction. The engine downloads these mmCIFs from RCSB.",
+ "pdbs": {
+  "1CSL": {},
+  "1DFU": {}
+ }
+}

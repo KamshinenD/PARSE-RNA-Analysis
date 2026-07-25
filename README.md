@@ -11,7 +11,9 @@ feature from raw structures.
 notebooks/
   figures/               main-text figure notebooks
   supplemental_figures/  supplemental figure notebooks
-figures/                 rendered PNGs
+figures/
+  main/                  rendered main-text PNGs
+  supplemental/          rendered supplemental PNGs
 scripts/
   data_gen/              feature + scoring-table regeneration
   validation/            PDB-REDO validation

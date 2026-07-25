@@ -1,0 +1,99 @@
+name: reproducibility
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Proves a fresh clone installs and the code is intact: dependencies resolve,
+  # every notebook is valid, and every script imports without error. This is the
+  # "does the repo work on someone else's machine" baseline (no data needed).
+  code-integrity:
+    name: install + notebooks valid + scripts import
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install requirements
+        run: pip install -r requirements.txt
+      - name: Notebooks are valid
+        run: |
+          python - <<'PY'
+          import glob, sys, nbformat
+          bad = 0
+          for nb in sorted(glob.glob("notebooks/**/*.ipynb", recursive=True)):
+              try:
+                  nbformat.read(nb, as_version=4); print("ok  ", nb)
+              except Exception as e:
+                  print("FAIL", nb, e); bad = 1
+          sys.exit(bad)
+          PY
+      - name: Scripts import without error
+        run: |
+          python - <<'PY'
+          import glob, sys, pathlib, importlib.util
+          sys.path.insert(0, "scripts/data_gen")
+          bad = 0
+          for f in sorted(glob.glob("scripts/**/*.py", recursive=True)):
+              # _vendor/* are package internals (relative imports); they are
+              # exercised transitively by the build_* scripts, not standalone.
+              if "/_vendor/" in f.replace("\\", "/"):
+                  continue
+              spec = importlib.util.spec_from_file_location("mod_" + pathlib.Path(f).stem, f)
+              mod = importlib.util.module_from_spec(spec)
+              try:
+                  spec.loader.exec_module(mod); print("ok  ", f)
+              except Exception as e:
+                  print("FAIL", f, type(e).__name__, e); bad = 1
+          sys.exit(bad)
+          PY
+
+  # Proves anyone can regenerate the feature tables from scratch: build the public
+  # PARSE engine, then extract features for 2 structures (the engine downloads
+  # their mmCIFs from RCSB). Uses a tiny fixture set, so no private data is needed.
+  engine-reproducibility:
+    name: build engine + regenerate features (2 structures)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install requirements (+ recent CMake)
+        run: pip install -r requirements.txt cmake
+      - name: Build the PARSE engine
+        run: |
+          git clone --depth 1 https://github.com/KamshinenD/PARSE-RNA
+          cmake -S PARSE-RNA -B PARSE-RNA/build -DCMAKE_BUILD_TYPE=Release
+          cmake --build PARSE-RNA/build -j"$(nproc)"
+          echo "PARSE_ENGINE=$GITHUB_WORKSPACE/PARSE-RNA/build/parse" >> "$GITHUB_ENV"
+      - name: Extract features for the 2 fixture structures
+        run: |
+          cd scripts/data_gen
+          python extract_pair_features.py \
+            --reference-set ../../.github/fixtures/mini_reference_set.json \
+            --output-dir /tmp/feat --workers 2
+          python extract_backbone_torsions.py \
+            --reference-set ../../.github/fixtures/mini_reference_set.json \
+            --output /tmp/feat/torsions_all.csv --workers 2
+      - name: Assert the tables were produced
+        run: |
+          python - <<'PY'
+          import pathlib, sys, pandas as pd
+          ok = True
+          for f in ["pairs.csv", "hbonds.csv", "torsions.csv", "torsions_all.csv"]:
+              p = pathlib.Path("/tmp/feat") / f
+              n = len(pd.read_csv(p)) if p.exists() else 0
+              print(("ok  " if n > 0 else "FAIL"), f, n, "rows")
+              ok = ok and n > 0
+          sys.exit(0 if ok else 1)
+          PY
