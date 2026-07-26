@@ -56,15 +56,53 @@ jobs:
           sys.exit(bad)
           PY
 
+  # Detects whether this push/PR actually touches the fetch path. The data
+  # download is ~400 MB per leg, so we only run it when it could have broken.
+  changes:
+    name: detect fetch-related changes
+    runs-on: ubuntu-latest
+    outputs:
+      fetch: ${{ steps.filter.outputs.fetch }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            fetch:
+              - 'scripts/fetch_data.sh'
+              - '.github/workflows/reproducibility.yml'
+
   # Proves a fresh clone can fetch the archived data with one command: run
   # fetch_data.sh (downloads data.zip from the public Google Drive archive and
   # unzips it) and assert the expected data/ tree lands where notebooks read it.
+  # Two diagonal legs cover both OSes and both download paths without redundant
+  # combos: ubuntu+curl exercises the curl fallback, macos+gdown exercises the
+  # gdown branch (and catches a gdown-flag regression like the --id removal).
+  # Runs only when the fetch script or this workflow changed (see `changes`),
+  # or on a manual dispatch.
   data-fetch:
-    name: fetch_data.sh downloads + unzips the archive
-    runs-on: ubuntu-latest
+    name: fetch_data.sh (${{ matrix.os }}, ${{ matrix.downloader }})
+    needs: changes
+    if: needs.changes.outputs.fetch == 'true' || github.event_name == 'workflow_dispatch'
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            downloader: curl
+          - os: macos-latest
+            downloader: gdown
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install gdown (gdown leg only)
+        if: matrix.downloader == 'gdown'
+        run: pip install gdown
       - name: Fetch the data archive
         run: bash scripts/fetch_data.sh
       - name: Assert data/ landed in the right place
