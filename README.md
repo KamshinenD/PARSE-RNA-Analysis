@@ -23,6 +23,8 @@ data/                    fetched from the archive (not in git)
 ## Setup
 
 ```bash
+git clone https://github.com/KamshinenD/PARSE-RNA-Analysis.git
+cd PARSE-RNA-Analysis
 pip install -r requirements.txt
 ```
 
