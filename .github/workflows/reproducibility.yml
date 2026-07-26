@@ -56,6 +56,38 @@ jobs:
           sys.exit(bad)
           PY
 
+  # Proves a fresh clone can fetch the archived data with one command: run
+  # fetch_data.sh (downloads data.zip from the public Google Drive archive and
+  # unzips it) and assert the expected data/ tree lands where notebooks read it.
+  data-fetch:
+    name: fetch_data.sh downloads + unzips the archive
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch the data archive
+        run: bash scripts/fetch_data.sh
+      - name: Assert data/ landed in the right place
+        run: |
+          python - <<'PY'
+          import pathlib, sys
+          expect = [
+              "data/reference/scoring_tables",
+              "data/comparison",
+              "data/validation",
+          ]
+          bad = 0
+          for d in expect:
+              p = pathlib.Path(d)
+              ok = p.is_dir() and any(p.iterdir())
+              print(("ok  " if ok else "FAIL"), d)
+              bad |= not ok
+          # the zip must be cleaned up, and data/ must not be empty
+          if pathlib.Path("data.zip").exists():
+              print("FAIL data.zip was not removed"); bad = 1
+          sys.exit(bad)
+          PY
+
   # Proves anyone can regenerate the feature tables from scratch: build the public
   # PARSE engine, then extract features for 2 structures (the engine downloads
   # their mmCIFs from RCSB). Uses a tiny fixture set, so no private data is needed.

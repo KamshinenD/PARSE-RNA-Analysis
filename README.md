@@ -36,7 +36,7 @@ output. Nothing to install or fetch.
 The `data/` directory is not tracked in git (see [Data](#data)). Fetch it:
 
 ```bash
-bash scripts/fetch_data.sh <your_hcc_username>   # rsync the archive into data/
+bash scripts/fetch_data.sh   # download data.zip from the archive and unzip into data/
 ```
 
 Then open the notebooks under `notebooks/figures/` and
@@ -112,12 +112,12 @@ the figures (Level 0) but needs the archive fetched for anything below that
 (Levels 1–3). The fetch is a single command — see [Level 1](#level-1--re-run-the-figures-from-the-archived-data):
 
 ```bash
-bash scripts/fetch_data.sh <your_hcc_username>
+bash scripts/fetch_data.sh
 ```
 
-It rsyncs `/mnt/nrdstor/yesselmanlab/dewan/PARSE-data/data/` (NRDStor, HCC —
-requires a yesselmanlab allocation) into `data/`; files already present are
-skipped. The archive will later be moved to Zenodo.
+It downloads `data.zip` (~400 MB) from Google Drive and unzips it into `data/`.
+If `data/` already exists and is non-empty the script does nothing. The archive
+will later be moved to Zenodo.
 
 ### What's in `data/reference/`
 
