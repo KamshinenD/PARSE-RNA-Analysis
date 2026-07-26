@@ -36,7 +36,7 @@ output. Nothing to install or fetch.
 The `data/` directory is not tracked in git (see [Data](#data)). Fetch it:
 
 ```bash
-bash scripts/fetch_data.sh   # download data.zip from the archive and unzip into data/
+bash scripts/fetch_data.sh
 ```
 
 Then open the notebooks under `notebooks/figures/` and
