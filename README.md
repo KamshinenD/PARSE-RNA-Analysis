@@ -116,7 +116,8 @@ bash scripts/fetch_data.sh
 ```
 
 It downloads `data.zip` (~400 MB) from Google Drive and unzips it into `data/`.
-If `data/` already exists and is non-empty the script does nothing. The archive
+Files already present in `data/` are kept (only missing files are extracted), so
+re-running is safe and won't clobber locally regenerated tables. The archive
 will later be moved to Zenodo.
 
 ### What's in `data/reference/`
