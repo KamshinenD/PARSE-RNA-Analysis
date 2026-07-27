@@ -63,8 +63,11 @@ python calculate_penalty_weights.py         # -> penalty_weights.json
 The feature CSVs come straight from the PARSE C++ engine. Build the engine,
 then re-extract:
 
+Run everything below from the repo root (`PARSE-RNA-Analysis/`); the engine is
+cloned as a sibling of `scripts/` and `data/`.
+
 ```bash
-# 1. Build the engine (C++20, CMake >= 3.28)
+# 1. Build the engine (C++20, CMake >= 3.28) — from the repo root
 git clone https://github.com/KamshinenD/PARSE-RNA
 cmake -S PARSE-RNA -B PARSE-RNA/build -DCMAKE_BUILD_TYPE=Release
 cmake --build PARSE-RNA/build -j
