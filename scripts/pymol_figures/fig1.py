@@ -19,7 +19,7 @@ sugar and backbone.
 
 Run me:
     python fig1.py            # opens PyMOL with panel 1A ready
-    panel("1C_ideal_GC")      # then File > Save Session As...
+    panel("1C_ideal_GC")
 """
 
 import os

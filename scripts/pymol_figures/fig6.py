@@ -18,7 +18,7 @@ chain, so a chain-A-only load cannot find it. (The manuscript caption calls it
 
 Run me:
     python fig6.py            # opens PyMOL with panel 6A ready
-    panel("6B")               # then File > Save Session As...
+    panel("6B")
 
 Needs the compiled engine: set PARSE_BINARY, or leave it and this script will
 look for it in the sibling checkout.
@@ -118,7 +118,7 @@ def build():
     cmd.do("parse_score %s, all" % OBJ)
     print("\n" + "=" * 62)
     print('  panel("6A") / panel("6B") / panel("6C")')
-    print("  then save the session yourself:  File > Save Session As...")
+    print('  ideal("off") / ideal("on")   hide or show the green template')
     print("=" * 62 + "\n")
 
 

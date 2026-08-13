@@ -194,5 +194,4 @@ def announce(panels):
     print("\n" + "=" * 62)
     print("panels: " + ", ".join(sorted(panels)))
     print('  panel("<name>")   set up one panel (hides the others)')
-    print("  then save your session yourself:  File > Save Session As...")
     print("=" * 62 + "\n")

@@ -23,7 +23,7 @@ exactly what panel A is binned on: `dssr_assigns:<class>` -> B, `novel` -> C,
 
 Run me:
     python figS1.py           # opens PyMOL with panel S1B ready
-    panel("S1C")              # then File > Save Session As...
+    panel("S1C")
     panel("all")              # all three at once
 """
 
