@@ -1,0 +1,81 @@
+{
+  "generated": 15,
+  "failed": 0,
+  "idealized_pairs": [
+    {
+      "lw_class": "cWW",
+      "sequence": "Aa",
+      "output_file": "cWW/A_a.pdb"
+    },
+    {
+      "lw_class": "cWW",
+      "sequence": "AC",
+      "output_file": "cWW/AC.pdb"
+    },
+    {
+      "lw_class": "cWW",
+      "sequence": "AG",
+      "output_file": "cWW/AG.pdb"
+    },
+    {
+      "lw_class": "cWW",
+      "sequence": "AU",
+      "output_file": "cWW/AU.pdb"
+    },
+    {
+      "lw_class": "cWW",
+      "sequence": "CA",
+      "output_file": "cWW/CA.pdb"
+    },
+    {
+      "lw_class": "cWW",
+      "sequence": "Cc",
+      "output_file": "cWW/C_c.pdb"
+    },
+    {
+      "lw_class": "cWW",
+      "sequence": "CG",
+      "output_file": "cWW/CG.pdb"
+    },
+    {
+      "lw_class": "cWW",
+      "sequence": "CU",
+      "output_file": "cWW/CU.pdb"
+    },
+    {
+      "lw_class": "cWW",
+      "sequence": "GA",
+      "output_file": "cWW/GA.pdb"
+    },
+    {
+      "lw_class": "cWW",
+      "sequence": "GC",
+      "output_file": "cWW/GC.pdb"
+    },
+    {
+      "lw_class": "cWW",
+      "sequence": "GU",
+      "output_file": "cWW/GU.pdb"
+    },
+    {
+      "lw_class": "cWW",
+      "sequence": "UA",
+      "output_file": "cWW/UA.pdb"
+    },
+    {
+      "lw_class": "cWW",
+      "sequence": "UC",
+      "output_file": "cWW/UC.pdb"
+    },
+    {
+      "lw_class": "cWW",
+      "sequence": "UG",
+      "output_file": "cWW/UG.pdb"
+    },
+    {
+      "lw_class": "cWW",
+      "sequence": "uU",
+      "output_file": "cWW/_uU.pdb"
+    }
+  ]
+}

@@ -4,5 +4,12 @@ __pycache__/
 .DS_Store
 
 # All data is fetched from NRDStor (see README) — not tracked in git.
-data/
+# Note this ignores the CONTENTS of data/ rather than data/ itself: git will
+# not descend into an excluded directory, so `data/` + `!data/figures/` cannot
+# re-include anything. Excluding `data/*` leaves the negation below workable.
+data/*
+# ...except the coordinates the PyMOL figure panels need (~1.6 MB): minimal
+# per-panel extracts plus the idealized templates. Committing them keeps
+# scripts/pymol_figures/ runnable from a fresh clone with no download.
+!data/figures/
 *.zip
