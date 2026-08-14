@@ -1,5 +1,9 @@
 # PARSE-RNA-Analysis
 
+> **This branch (`pymol-figures`) carries the PyMOL structural-panel work:**
+> `scripts/pymol_figures/` and the vendored coordinates in `data/figures/`.
+> `main` does not have them. Everything else below is shared with `main`.
+
 Notebooks, figures, and the full data-generation pipeline for the PARSE
 manuscript. Everything here is reproducible from the public PARSE-RNA engine and
 the archived data - from viewing a finished figure down to regenerating every
