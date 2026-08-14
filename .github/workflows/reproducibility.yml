@@ -52,10 +52,10 @@ jobs:
               # exercised transitively by the build_* scripts, not standalone.
               if "/_vendor/" in f.replace("\\", "/"):
                   continue
-              # pymol_figures/* render the structural panels and import `pymol`,
-              # which is not a pip dependency (conda/installer only), so it is
-              # absent on the runner. Syntax is still checked below.
-              if "/pymol_figures/" in f.replace("\\", "/"):
+              # reference/* drive the PARSE engine repos, which are expected as
+              # siblings of this checkout and are not present on the runner.
+              # Syntax is still checked below.
+              if "/reference/" in f.replace("\\", "/"):
                   continue
               spec = importlib.util.spec_from_file_location("mod_" + pathlib.Path(f).stem, f)
               mod = importlib.util.module_from_spec(spec)
@@ -65,12 +65,12 @@ jobs:
                   print("FAIL", f, type(e).__name__, e); bad = 1
           sys.exit(bad)
           PY
-      - name: PyMOL figure scripts compile
+      - name: Engine-driven scripts compile
         run: |
           python - <<'PY'
           import glob, py_compile, sys
           bad = 0
-          for f in sorted(glob.glob("scripts/pymol_figures/*.py")):
+          for f in sorted(glob.glob("scripts/reference/*.py")):
               try:
                   py_compile.compile(f, doraise=True); print("ok  ", f)
               except Exception as e:

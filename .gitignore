@@ -3,13 +3,23 @@ __pycache__/
 .ipynb_checkpoints/
 .DS_Store
 
-# All data is fetched from NRDStor (see README) — not tracked in git.
+# All data is fetched from the archive (see README) - not tracked in git.
 # Note this ignores the CONTENTS of data/ rather than data/ itself: git will
-# not descend into an excluded directory, so `data/` + `!data/figures/` cannot
-# re-include anything. Excluding `data/*` leaves the negation below workable.
+# not descend into an excluded directory, so `data/` plus a negation cannot
+# re-include anything. Excluding `data/*` leaves the negations below workable.
 data/*
-# ...except the coordinates the PyMOL figure panels need (~1.6 MB): minimal
-# per-panel extracts plus the idealized templates. Committing them keeps
-# scripts/pymol_figures/ runnable from a fresh clone with no download.
-!data/figures/
+# ...except the 24 KB pucker density the backbone notebook plots. data/reference
+# must be re-included before a file inside it can be, then its other contents
+# excluded again.
+!data/reference/
+data/reference/*
+!data/reference/pucker_delta_pperp_hist.npz
+
+# Notebook plots that are not manuscript figures: the executed notebooks embed
+# their own output, so there is nothing to keep here.
+figures/exploratory/
+figures/pse/
+
+# PyMOL writes fetched structures into the working directory.
+*.cif
 *.zip
