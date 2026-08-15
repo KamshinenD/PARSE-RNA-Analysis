@@ -4,6 +4,10 @@ on:
   push:
   pull_request:
   workflow_dispatch:
+  schedule:
+    # Weekly. The data archive lives outside the repo, so it can rot (link
+    # removed, quota, a re-upload that drops a file) with nothing here changing.
+    - cron: "0 6 * * 1"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -85,13 +89,23 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       fetch: ${{ steps.filter.outputs.fetch }}
+      notebooks: ${{ steps.filter.outputs.notebooks }}
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
         id: filter
+        # No diff base on schedule/dispatch: the step is skipped, the outputs
+        # come back empty, and the jobs below fall through to their own
+        # event checks.
+        if: github.event_name == 'push' || github.event_name == 'pull_request'
         with:
           filters: |
             fetch:
+              - 'scripts/fetch_data.sh'
+              - '.github/workflows/reproducibility.yml'
+            notebooks:
+              - 'notebooks/**'
+              - 'requirements.txt'
               - 'scripts/fetch_data.sh'
               - '.github/workflows/reproducibility.yml'
 
@@ -189,4 +203,60 @@ jobs:
               print(("ok  " if n > 0 else "FAIL"), f, n, "rows")
               ok = ok and n > 0
           sys.exit(0 if ok else 1)
+          PY
+
+  # Proves the published archive actually drives the analysis: fetch data.zip
+  # exactly as a reader would, then execute every notebook against it. The
+  # code-integrity job only parses notebooks; this one runs them, so it is what
+  # catches a stale archive - a notebook reading a file or column that the
+  # uploaded zip does not have. Gated like data-fetch because the download is
+  # ~400 MB and Google Drive enforces a daily quota; the weekly schedule keeps
+  # it honest when nothing is being pushed.
+  notebooks-run:
+    name: fetch data + execute every notebook
+    needs: changes
+    if: >-
+      needs.changes.outputs.notebooks == 'true' ||
+      github.event_name == 'workflow_dispatch' ||
+      github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install requirements
+        run: pip install -r requirements.txt
+      - name: Fetch the data archive
+        run: bash scripts/fetch_data.sh
+      - name: Execute every notebook
+        run: |
+          python - <<'PY'
+          import glob, pathlib, subprocess, sys, tempfile, time
+
+          out = tempfile.mkdtemp()
+          notebooks = sorted(glob.glob("notebooks/**/*.ipynb", recursive=True))
+          if not notebooks:
+              print("no notebooks found"); sys.exit(1)
+
+          failed = []
+          for nb in notebooks:
+              t0 = time.time()
+              # Executed out of place: CI must not rewrite the committed
+              # outputs, only prove they can be regenerated.
+              r = subprocess.run(
+                  ["jupyter", "nbconvert", "--to", "notebook", "--execute", nb,
+                   "--output-dir", out, "--ExecutePreprocessor.timeout=900"],
+                  capture_output=True, text=True)
+              dt = time.time() - t0
+              if r.returncode == 0:
+                  print(f"ok    {nb}  ({dt:.0f}s)", flush=True)
+              else:
+                  failed.append(nb)
+                  print(f"FAIL  {nb}  ({dt:.0f}s)", flush=True)
+                  print(r.stderr[-3000:], flush=True)
+
+          print(f"\n{len(notebooks) - len(failed)}/{len(notebooks)} notebooks ran")
+          sys.exit(1 if failed else 0)
           PY
