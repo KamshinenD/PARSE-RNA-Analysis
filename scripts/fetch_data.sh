@@ -10,7 +10,7 @@
 set -euo pipefail
 
 # Google Drive file id for data.zip (share link: .../file/d/<FILE_ID>/view).
-FILE_ID="${PARSE_DATA_FILE_ID:-1U8nDJfSeA5H59TzdkIEYEDe5-kxcwZcw}"
+FILE_ID="${PARSE_DATA_FILE_ID:-1ozLbscHg8NFYVoURuIDklLKOApB7xu8P}"
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 ZIP="$REPO_ROOT/data.zip"
