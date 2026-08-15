@@ -14,7 +14,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # Proves a fresh clone installs and the code is intact: dependencies resolve,
+  # Proves a fresh clone installs and the code is intact: dependencies resolve,,
   # every notebook is valid, and every script imports without error. This is the
   # "does the repo work on someone else's machine" baseline (no data needed).
   # Runs on Linux and macOS so both a reviewer's Mac and a Linux box are covered.
@@ -230,6 +230,33 @@ jobs:
         run: pip install -r requirements.txt
       - name: Fetch the data archive
         run: bash scripts/fetch_data.sh
+      - name: Archive contains what the notebooks read
+        # Fail here, naming the missing files, rather than 300 lines into a
+        # notebook traceback. A missing file means the published archive is
+        # older than the notebooks: re-upload data.zip.
+        run: |
+          python - <<'PY'
+          import pathlib, sys
+          needed = [
+              "data/reference/all_uniques_features/torsions.csv",
+              "data/reference/all_uniques_features/pairs.csv",
+              "data/reference/scores/scores_all_uniques.json",
+              "data/reference/metadata/metadata_cache.json",
+              "data/reference/scoring_tables/prosco_distributions.json",
+              "data/reference/backbone_recommendations.csv",
+              "data/reference/backbone_recommendations_summary.json",
+              "data/reference/pucker_uniques.jsonl",
+              "data/reference/pucker_delta_pperp_hist.npz",
+          ]
+          missing = [f for f in needed if not pathlib.Path(f).exists()]
+          for f in needed:
+              print(("ok    " if f not in missing else "MISSING"), f)
+          if missing:
+              print("\nThe published data.zip is out of date. Re-upload it from "
+                    "the repo root (Drive > Manage versions > Upload new version, "
+                    "so the file id stays the same).")
+          sys.exit(1 if missing else 0)
+          PY
       - name: Execute every notebook
         run: |
           python - <<'PY'
