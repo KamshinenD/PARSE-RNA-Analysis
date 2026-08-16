@@ -121,9 +121,11 @@ bash scripts/fetch_data.sh
 ```
 
 It downloads `data.zip` (~400 MB) from Google Drive and unzips it into `data/`.
-Files already present in `data/` are kept (only missing files are extracted), so
-re-running is safe and won't clobber locally regenerated tables. The archive
-will later be moved to Zenodo.
+Extraction is an update rather than a plain overwrite: a file is replaced only
+when the archived copy is newer than the one on disk, anything missing is added,
+and tables regenerated locally (Levels 2-3) are newer and so survive. Re-running
+after the archive is refreshed therefore picks up the new data without
+clobbering your own. The archive will later be moved to Zenodo.
 
 ### What's in `data/reference/`
 
