@@ -1,6 +1,6 @@
 """Build per-(bp_type, edge_type, parameter) ProSco lookup tables.
 
-ProSco — *probability percentile score* — is the density-based scoring
+ProSco - *probability percentile score* - is the density-based scoring
 metric from Černý et al. 2026 (NAR gkaf1335). It avoids the heavy-tail
 issues of Z' by working directly with the empirical density:
 
@@ -170,7 +170,7 @@ def build_prosco_cell(values: np.ndarray, weights: np.ndarray,
     # Sort bins by descending density; cumulative mass through that order.
     order_desc = np.argsort(-dens)
     cum_through_higher = np.cumsum(mass[order_desc])
-    # Shift so the cumulative *up to and not including* this bin is used —
+    # Shift so the cumulative *up to and not including* this bin is used -
     # the bin with the single highest density gets ProSco ≈ 100.
     cum_excluding_self = np.concatenate([[0.0], cum_through_higher[:-1]])
     prosco_sorted = 100.0 * (1.0 - cum_excluding_self)

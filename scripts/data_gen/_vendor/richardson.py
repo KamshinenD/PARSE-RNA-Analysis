@@ -235,7 +235,7 @@ class RichardsonClassifier:
         Each satellite in the bin defines its own dom_widths override
         describing how the dominant's territory should be reshaped when
         competing with *that* satellite. We try every override and keep
-        the one yielding the smallest d4 — the dominant's best fit against
+        the one yielding the smallest d4 - the dominant's best fit against
         any satellite-paired width set.
         """
         best_d = float("inf")

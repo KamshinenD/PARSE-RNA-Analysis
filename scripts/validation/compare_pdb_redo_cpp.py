@@ -11,7 +11,7 @@ and write both validation files (raw scores only; deltas computed in-notebook):
     data/validation/pdb_redo_comparison_all.json    (structure-level aggregates)
     data/validation/pdb_redo_pairs_comparison.json  (per matched base pair)
 
-Build the engine and set PARSE_ENGINE (or put `parse` on PATH) — see the repo
+Build the engine and set PARSE_ENGINE (or put `parse` on PATH) - see the repo
 README. The validation set is whatever REDO files are present under --redo-cache.
 """
 
@@ -45,8 +45,9 @@ def _init_worker(engine: str, redo_cache: Path) -> None:
 
 def run_parse(arg: str) -> dict | None:
     """Run `parse` on a PDB id or coordinate file; return its JSON (stdout)."""
+    src = [arg] if Path(arg).exists() else _engine.structure_args(arg)
     try:
-        out = subprocess.run([_ENGINE, arg], capture_output=True, text=True, timeout=900)
+        out = subprocess.run([_ENGINE, *src], capture_output=True, text=True, timeout=900)
     except Exception:  # noqa: BLE001
         return None
     if out.returncode != 0 or not out.stdout.strip():

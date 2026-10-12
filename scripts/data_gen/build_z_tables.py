@@ -31,7 +31,7 @@ from _vendor.hbond_distance_policy import (  # noqa: E402
 REF = REPO / "data" / "reference"
 OUT = REF / "scoring_tables" / "z_tables.json"
 
-PHI_INV_09 = 1.2815515655446004  # Phi^-1(0.9) — same scaling as Cerny
+PHI_INV_09 = 1.2815515655446004  # Phi^-1(0.9) - same scaling as Cerny
 
 PAIR_PARAMS = ["shear", "stretch", "stagger", "buckle", "propeller", "opening"]
 HB_PARAMS = ["distance", "donor_angle", "acceptor_angle"]

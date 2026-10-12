@@ -4,7 +4,7 @@ unpaired) in the high-quality reference set.
 Unlike extract_pair_features.py (one torsion row per residue-in-a-pair), this
 walks every residue with a valid 7D suite in each structure, so the
 per-conformer torsion distributions (build_backbone_distributions.py) represent
-loops/junctions — where backbone errors concentrate — not just helical context.
+loops/junctions - where backbone errors concentrate - not just helical context.
 
 Runs the PARSE C++ engine (`parse --details`) and reads its top-level
 `backbone_torsions` array. The engine downloads each mmCIF itself (see
@@ -82,7 +82,7 @@ def main() -> None:
     args.output.parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(args.output, index=False)
     if df.empty:
-        print(f"\nWrote {args.output} (EMPTY) — the engine returned no `backbone_torsions`. "
+        print(f"\nWrote {args.output} (EMPTY) - the engine returned no `backbone_torsions`. "
               "Build `parse` from a PARSE-RNA version that emits per-residue backbone torsions.")
         return
     print(f"\nWrote {args.output}")

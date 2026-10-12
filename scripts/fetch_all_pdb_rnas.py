@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """Fetch a CSV of EVERY RNA-containing structure in the PDB (redundant included).
 
-Uses the public RCSB APIs — no clustering, so this is the full deposited set:
+Uses the public RCSB APIs - no clustering, so this is the full deposited set:
   1. Search API: all entries with >= 1 RNA polymer entity.
   2. Data API (GraphQL): batch-fetch per-entry metadata.
 

@@ -2,7 +2,7 @@
 
 For each candidate PDB id, fetch ``<id>_final.pdb`` from pdb-redo.eu into
 ``data/validation/redo_files/<ID>/<ID>.pdb``. IDs without a PDB-REDO entry
-(HTTP 404) are skipped — the ids that succeed ARE the validation set that
+(HTTP 404) are skipped - the ids that succeed ARE the validation set that
 compare_pdb_redo_cpp.py then scores against the original RCSB coordinates.
 
 Candidates default to the non-redundant RNA set

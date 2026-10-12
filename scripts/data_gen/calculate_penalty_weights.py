@@ -49,7 +49,11 @@ from _vendor.helpers import REPORT_GROUPS  # noqa: E402
 PAIR_PARAMS = ["shear", "stretch", "stagger", "buckle", "propeller", "opening"]
 HB_PARAMS = ["distance", "hbond_angles"]  # Combined donor + acceptor angles
 ALL_PARAMS = PAIR_PARAMS + HB_PARAMS  # 8 continuous parameters
-FEATURES = ALL_PARAMS + ["incorrect_hbond_count"]  # 9 total
+FEATURES = ALL_PARAMS + ["incorrect_hbond_count", "clash"]  # 10 total
+
+# Clash severity. Must match scoring/clashes.py in the engine.
+CLASH_THRESHOLD = 0.4
+SEVERITY_CAP = 0.9
 
 SELF_RECIP = {"cWW", "tWW", "cHH", "tHH", "cSS", "tSS"}
 SIGN_FLIP = {"shear", "stagger", "buckle"}
@@ -130,16 +134,27 @@ class ZPrimeLookup:
 def cerny_severity(
     value, prosco_lookup, zprime_lookup, source, param, bp_type, lw_class
 ):
-    """Cerny severity: 0 if ProSco >= 5 (Preferred), else min(1, |Z'|/5)."""
+    """severity = min(1, |Z'|/5) * clamp((5-ProSco)/5, 0, 1), 0 if ProSco >= 5.
+
+    The ProSco ramp keeps severity continuous at the boundary. Keep in sync
+    with the engine's scoring/issues.py.
+    """
     p = prosco_lookup.prosco(value, source, param, bp_type, lw_class)
-    if p is None:
+    if p is None or p >= 5.0:
         return 0.0
-    if p >= 5.0:
-        return 0.0
+    ramp = min(1.0, max(0.0, (5.0 - p) / 5.0))
     z = zprime_lookup.zprime(value, source, param, bp_type, lw_class)
     if z is None:
-        return 1.0
-    return min(1.0, abs(z) / 5.0)
+        return ramp
+    return min(1.0, abs(z) / 5.0) * ramp
+
+
+def clash_severity(overlap):
+    """clamp((overlap - CLASH_THRESHOLD) / (SEVERITY_CAP - CLASH_THRESHOLD), 0, 1)."""
+    if overlap is None or (isinstance(overlap, float) and math.isnan(overlap)):
+        return 0.0
+    span = SEVERITY_CAP - CLASH_THRESHOLD
+    return min(1.0, max(0.0, (overlap - CLASH_THRESHOLD) / span))
 
 
 def canonical_count(cat_dists, bp_type, lw_class):
@@ -172,11 +187,15 @@ def compute_severities(
     rows = []
     for r in pairs_df.itertuples(index=False):
         bp, lw = r.bp_type, r.lw_class
-        _, sw = canonicalize_bp(bp, lw)
 
         def pv(p):
-            v = getattr(r, p)
-            return -v if (sw and p in SIGN_FLIP) else v
+            # No sign flip here: ProScoLookup.prosco and ZPrimeLookup.zprime each
+            # apply maybe_flip internally. Flipping here as well cancelled it, so
+            # shear/stagger/buckle were evaluated in the un-canonicalised
+            # orientation against canonicalised cells for the ~38% of reference
+            # pairs that need swapping, and the fitted weights disagreed with the
+            # runtime engine (which flips exactly once).
+            return getattr(r, p)
 
         row = {"pdb_id": r.pdb_id}
         # 6 pair geometry parameters individually
@@ -213,6 +232,9 @@ def compute_severities(
         row["incorrect_hbond_count"] = (
             0.0 if (can <= 0 or act >= can) else (can - act) / can
         )
+
+        # Steric clash, from the raw overlap emitted by `parse --details`.
+        row["clash"] = clash_severity(getattr(r, "clash_overlap", None))
 
         rows.append(row)
     return pd.DataFrame(rows)
@@ -335,7 +357,7 @@ def main():
     # Renormalize to sum = 100
     total_logodds = sum(r["raw_logodds"] for r in results)
     if total_logodds < 1e-9:
-        raise ValueError("All log-odds are zero or negative — something is wrong")
+        raise ValueError("All log-odds are zero or negative - something is wrong")
 
     for r in results:
         r["weight"] = 100.0 * r["raw_logodds"] / total_logodds
@@ -378,15 +400,18 @@ def main():
                 "  - weight_i = log(s_poor_i / s_good_i)  [clipped to >= 0]",
                 "  - Renormalize to sum = 100",
                 "",
-                "Cerny severity (Cerny et al. NAR 2026 gkaf1335):",
+                "Severity (Cerny et al. NAR 2026 gkaf1335, ramped off the boundary):",
                 "  - severity = 0 if ProSco >= 5 (Preferred)",
-                "  - severity = min(1, |Z'|/5) otherwise",
+                "  - severity = min(1, |Z'|/5) * clamp((5 - ProSco)/5, 0, 1) otherwise",
+                "  - clash    = clamp((overlap - 0.4)/(0.9 - 0.4), 0, 1)",
                 "",
                 "At runtime:",
                 "    penalty = Σ penalty_weights[param] × severity[param]",
                 "    score   = max(0, min(100, 100 − penalty))",
             ],
-            "severity_definition": "Cerny: 0 if ProSco >= 5, else min(1, |Z'|/5)",
+            "severity_definition": "Cerny ramped: 0 if ProSco >= 5, else "
+                                   "min(1, |Z'|/5) * clamp((5 - ProSco)/5, 0, 1); "
+                                   "clash: clamp((overlap - 0.4)/(0.9 - 0.4), 0, 1)",
             "prosco_preferred_threshold": 5.0,
         },
         "good_reference_set": {

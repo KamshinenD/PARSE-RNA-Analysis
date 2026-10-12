@@ -2,7 +2,7 @@
 
 Backbone analogue of build_prosco_distributions.py / build_z_tables.py. The
 scoring *cell* is the Richardson conformer (the backbone twin of bp_type×lw_class):
-a torsion is only unimodal — and therefore ProSco/Z'-scorable — *within* a
+a torsion is only unimodal - and therefore ProSco/Z'-scorable - *within* a
 conformer. Pooling conformers makes each torsion multimodal, so there is NO
 _ANY fallback here; conformers with too few observations are simply omitted and
 the runtime falls back to the Richardson fixed width.
@@ -57,7 +57,7 @@ _PREV_COLS = {"delta": 0, "epsilon": 1, "zeta": 2}
 def reconstruct_suites(df: pd.DataFrame) -> pd.DataFrame:
     """One row per residue with its 7D suite (0-360), conformer, suite_bin, pdb.
 
-    Keeps only non-outlier residues with a real conformer — the reference
+    Keeps only non-outlier residues with a real conformer - the reference
     distribution of where each torsion sits *when the residue is in* that cluster.
     """
     res = df.drop_duplicates(subset=["pdb_id", "res_id"]).copy()

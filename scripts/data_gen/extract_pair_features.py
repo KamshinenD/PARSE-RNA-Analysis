@@ -4,16 +4,16 @@ Loops over every PDB in data/reference/reference_sets/reference_set.json, runs
 the PARSE C++ engine (`parse --details`), and writes three CSV tables under
 data/reference/high_quality_features/:
 
-    pairs.csv     — one row per base-base pair (Tsukuba params, plane angle,
+    pairs.csv     - one row per base-base pair (Tsukuba params, plane angle,
                         template RMSD, lw_class, etc.)
-    hbonds.csv    — one row per H-bond inside a base-base pair (distance,
+    hbonds.csv    - one row per H-bond inside a base-base pair (distance,
                         donor / acceptor angles, slot alignment)
-    torsions.csv  — one row per residue-in-a-pair (alpha-zeta + Richardson
+    torsions.csv  - one row per residue-in-a-pair (alpha-zeta + Richardson
                         suite), tagged with the pair's bp_type / lw_class
 
 Non-base-base or is_ambiguous pairs are excluded (they would muddy the
 per-(bp_type, edge_type) reference distributions). The engine downloads each
-mmCIF itself, so no local structure files are needed — see _engine.py.
+mmCIF itself, so no local structure files are needed - see _engine.py.
 """
 
 import argparse
@@ -54,6 +54,9 @@ def extract_one(pdb_id: str, d: dict) -> tuple[list, list, list]:
             "template_rmsd": p.get("template_rmsd"),
             "num_hbonds": p["num_hbonds"], "num_base_hbonds": n_base,
             "quality_score": p["quality_score"],
+            # Raw overlap behind the `clash` penalty; ungated, so
+            # calculate_penalty_weights.py applies the threshold itself.
+            "clash_overlap": p.get("clash_overlap"),
         })
         for hb in p.get("hbonds", []):
             hbonds.append({

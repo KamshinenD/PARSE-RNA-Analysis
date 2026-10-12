@@ -1,18 +1,18 @@
 """Canonical orientation for self-reciprocal LW classes.
 
 A pair like G-C/cWW and the reverse C-G/cWW are the same physical pair
-viewed from either end — for self-reciprocal LW classes (where both
+viewed from either end - for self-reciprocal LW classes (where both
 edges are the same kind), the only difference is which residue is
 listed first. Without this module, the build pipeline splits such
 pairs into two mirror cells, halving the data available to each.
 
 Canonical form: residues in alphabetical order. So G-C/cWW becomes
 C-G/cWW, U-A/cWW becomes A-U/cWW, etc. Heteroreciprocal LW classes
-(cWH, cWS, tHS, …) are NOT canonicalized — their two orderings are
+(cWH, cWS, tHS, …) are NOT canonicalized - their two orderings are
 genuinely different pair types.
 
 Some pair-geometry parameters flip sign when the residues are swapped
-(shear, stagger, buckle) — the script that builds distributions and the
+(shear, stagger, buckle) - the script that builds distributions and the
 runtime that queries them both apply this flip before the |Z'| math.
 
 Used by:

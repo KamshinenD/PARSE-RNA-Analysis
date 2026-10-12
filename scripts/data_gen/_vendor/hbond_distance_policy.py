@@ -38,7 +38,7 @@ WC_DISTANCE_CELLS: frozenset[tuple[str, str]] = frozenset({
     ("C-G", "cWW"), ("A-U", "cWW"),
 })
 
-# "Strong" base-base bond cutoff — mirrors max_hbond_distance in the finder
+# "Strong" base-base bond cutoff - mirrors max_hbond_distance in the finder
 # config (pair_finder.finder.finder.FinderConfig).
 MAX_STRONG_DISTANCE = 3.5
 
@@ -46,7 +46,7 @@ MAX_STRONG_DISTANCE = 3.5
 # parse/alt-conf artifact); excluded everywhere.
 MIN_PHYSICAL_DISTANCE = 2.2
 
-# Base-ring atoms — mirrors pair_finder.scoring.features._BASE_ATOMS so the
+# Base-ring atoms - mirrors pair_finder.scoring.features._BASE_ATOMS so the
 # distance distribution is built from the same bonds the scorer evaluates.
 BASE_ATOMS: frozenset[str] = frozenset({
     "N1", "N2", "N3", "N4", "N6", "N7", "N9", "O2", "O4", "O6",

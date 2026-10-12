@@ -10,6 +10,7 @@ REPORT_GROUPS = {
     "H-Bond Distance":            ["distance"],
     "H-Bond Angles":              ["hbond_angles"],
     "Incorrect H-Bond Count":     ["incorrect_hbond_count"],
+    "Steric Clash":               ["clash"],
 }
 
 # --- from pair_finder.core.identifiers ---------------------------------------
